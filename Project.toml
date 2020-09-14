@@ -1,2 +1,6 @@
 [deps]
 ClimateMARGO = "d3f62095-a717-45bf-aadc-ac9dfc258fa6"
+IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
+PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
+PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
