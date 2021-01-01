@@ -1,4 +1,5 @@
-function DICE_EBM(t, F; ζ = [0.098, 3.8/2.9, 0.088, 0.025], physics=nothing, default="DICE-2013r", Δt = nothing)    
+function DICE_EBM(t, Δt, F; physics=nothing, default="DICE-2013r", return_params=false)
+    ζ = [0., 0., 0., 0.]
     if isnothing(physics)
         if default == "Geoffroy-2013"
             physics = Dict("Δt" => Δt, "Cu" => 7.3, "Cd" => 106., "κ" => 0.73, "B" => 1.13)
@@ -7,23 +8,22 @@ function DICE_EBM(t, F; ζ = [0.098, 3.8/2.9, 0.088, 0.025], physics=nothing, de
         elseif default == "MARGO"
             physics = Dict("Δt" => Δt, "Cu" => 0., "Cd" => 106., "κ" => 0.73, "B" => 1.13)
         elseif default == "DICE-2013r"
-            physics = nothing
-        elseif default == "DICE-NoMixing"
-            physics = nothing
+            ζ = [0.098, 3.8/2.9, 0.088, 0.025]
+            physics = Dict("Δt" => Δt, "Cu" => 5. /ζ[1], "Cd" =>  ζ[3]*5. /ζ[4], "κ" => ζ[3], "B" => ζ[2])
+        elseif default == "DICE-2016R"
+            ζ = [0.1005, 3.6813/3.1, 0.088, 0.025]
+            physics = Dict("Δt" => Δt, "Cu" => 5. /ζ[1], "Cd" =>  ζ[3]*5. /ζ[4], "κ" => ζ[3], "B" => ζ[2])
+        elseif default == "DICE-2013r-NoMixing"
+            ζ = [0.098, 3.8/2.9, 0.088, 0.025]
             ζ[3] = 0.
+            physics = Dict("Δt" => Δt, "Cu" => 5. /ζ[1], "Cd" =>  ζ[3]*5. /ζ[4], "κ" => ζ[3], "B" => ζ[2])
         end
     end
-        
-    if !isnothing(physics)
-        ζ[1] = Δt/physics["Cu"]
-        ζ[2] = physics["B"]
-        ζ[3] = physics["κ"]
-        ζ[4] = physics["κ"]*physics["Δt"]/physics["Cd"]
-    end
     
-    if isnothing(Δt)
-        print("Need to set Δt!")
-    end 
+    ζ[1] = Δt/physics["Cu"]
+    ζ[2] = physics["B"]
+    ζ[3] = physics["κ"]
+    ζ[4] = physics["κ"]*physics["Δt"]/physics["Cd"]
     
     T = zeros(size(t))
     T_LO = zeros(size(t))
@@ -37,5 +37,9 @@ function DICE_EBM(t, F; ζ = [0.098, 3.8/2.9, 0.088, 0.025], physics=nothing, de
         T_LO[i+1] = T_LO[i] + ζ[4]*(T[i] - T_LO[i])
     end
     
-    return T
+    if return_params
+        return physics
+    else
+        return T
+    end
 end;
